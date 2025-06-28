@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐭 Mäuse-Labyrinth Abenteuer</title>
+    <title>🐭 Mäuse-Labyrinth MEGA GROSS iPhone</title>
     <style>
         body {
             margin: 0;
@@ -15,12 +15,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            position: fixed;
+            overflow: auto;
+            position: relative;
             width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
+            min-height: 100vh;
             touch-action: none;
         }
         
@@ -320,10 +318,11 @@
                 margin-bottom: 10px;
             }
             .maze-container {
-                transform: scale(0.5);
+                transform: scale(1.4);
                 transform-origin: center;
-                margin: -15px auto -5px;
-                max-width: 90vw;
+                margin: 0px auto 0px;
+                max-width: 100vw;
+                overflow: visible;
             }
             .control-pad {
                 width: 110px;
@@ -345,20 +344,21 @@
         /* iPhone 12 Pro specific (390px) */
         @media (max-width: 400px) and (min-width: 375px) {
             .maze-container {
-                transform: scale(0.45);
-                margin: -20px auto -10px;
-                max-width: 95vw;
+                transform: scale(1.6);
+                margin: 0px auto 0px;
+                max-width: 100vw;
+                overflow: visible;
             }
         }
 
         @media (max-width: 400px) {
             body {
-                padding: 1px;
+                padding: 0px;
             }
             .game-container {
-                padding: 6px;
-                margin: 1px;
-                max-width: 99vw;
+                padding: 2px;
+                margin: 0px;
+                max-width: 100vw;
             }
             h1 {
                 font-size: 1.3rem;
@@ -373,9 +373,10 @@
                 margin-bottom: 6px;
             }
             .maze-container {
-                transform: scale(0.42);
-                margin: -25px auto -15px;
-                max-width: 92vw;
+                transform: scale(1.5);
+                margin: 0px auto 0px;
+                max-width: 100vw;
+                overflow: visible;
             }
             .control-pad {
                 width: 85px;
@@ -417,9 +418,10 @@
                 margin-bottom: 4px;
             }
             .maze-container {
-                transform: scale(0.38);
-                margin: -30px auto -20px;
-                max-width: 90vw;
+                transform: scale(1.4);
+                margin: 0px auto 0px;
+                max-width: 100vw;
+                overflow: visible;
             }
             .control-pad {
                 width: 75px;
@@ -448,9 +450,10 @@
         /* MEGA AGGRESSIVE für winzige Screens */
         @media (max-width: 320px) {
             .maze-container {
-                transform: scale(0.35);
-                margin: -35px auto -25px;
-                max-width: 88vw;
+                transform: scale(1.3);
+                margin: 0px auto 0px;
+                max-width: 100vw;
+                overflow: visible;
             }
             h1 {
                 font-size: 0.9rem;
@@ -470,7 +473,7 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>🐭 Mäuse-Labyrinth Abenteuer</h1>
+        <h1>🐭 MEGA Mäuse-Labyrinth</h1>
         <p class="instructions">Hilf der kleinen Maus, durch das Labyrinth zu navigieren und alle Käsestücke zu sammeln!</p>
         
         <div class="score-board">
@@ -500,7 +503,7 @@
         <div class="controls">
             <p>🎮 Steuerung: WASD, Pfeiltasten oder Touch-Buttons</p>
             <p>🧀 Sammle alle Käsestücke um zu gewinnen!</p>
-            <p>📱 iPhone optimiert! Wisch-Gesten oder Touch-Buttons nutzen!</p>
+            <p>📱 iPhone MEGA GROSS optimiert! Wisch-Gesten nutzen!</p>
         </div>
     </div>
 
