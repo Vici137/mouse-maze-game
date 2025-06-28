@@ -29,9 +29,11 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-            padding: 30px;
-            max-width: 600px;
+            padding: 25px;
+            max-width: 95vw;
             touch-action: none;
+            box-sizing: border-box;
+            margin: 0 auto;
         }
         
         h1 {
@@ -320,11 +322,12 @@
                 margin-bottom: 10px;
             }
             .maze-container {
-                transform: scale(0.65);
+                transform: scale(1.3);
                 transform-origin: center;
                 margin: 0px auto 15px;
-                max-width: 85%;
-                overflow: hidden;
+                max-width: 100%;
+                overflow: visible;
+                box-sizing: border-box;
             }
             .control-pad {
                 width: 110px;
@@ -346,10 +349,11 @@
         /* iPhone 12 Pro specific (390px) */
         @media (max-width: 400px) and (min-width: 375px) {
             .maze-container {
-                transform: scale(0.55);
+                transform: scale(1.1);
                 margin: 0px auto 10px;
-                max-width: 85%;
-                overflow: hidden;
+                max-width: 100%;
+                overflow: visible;
+                box-sizing: border-box;
             }
         }
 
@@ -358,9 +362,10 @@
                 padding: 0px;
             }
             .game-container {
-                padding: 5px;
-                margin: 2px;
-                max-width: 98vw;
+                padding: 3px;
+                margin: 1px auto;
+                max-width: 96vw;
+                box-sizing: border-box;
             }
             h1 {
                 font-size: 1.3rem;
@@ -375,10 +380,11 @@
                 margin-bottom: 6px;
             }
             .maze-container {
-                transform: scale(0.50);
+                transform: scale(1.0);
                 margin: 0px auto 10px;
-                max-width: 85%;
-                overflow: hidden;
+                max-width: 100%;
+                overflow: visible;
+                box-sizing: border-box;
             }
             .control-pad {
                 width: 85px;
@@ -420,10 +426,11 @@
                 margin-bottom: 4px;
             }
             .maze-container {
-                transform: scale(0.45);
+                transform: scale(0.9);
                 margin: 0px auto 10px;
-                max-width: 85%;
-                overflow: hidden;
+                max-width: 100%;
+                overflow: visible;
+                box-sizing: border-box;
             }
             .control-pad {
                 width: 75px;
@@ -452,10 +459,11 @@
         /* MEGA AGGRESSIVE für winzige Screens */
         @media (max-width: 320px) {
             .maze-container {
-                transform: scale(0.40);
+                transform: scale(0.8);
                 margin: 0px auto 10px;
-                max-width: 85%;
-                overflow: hidden;
+                max-width: 100%;
+                overflow: visible;
+                box-sizing: border-box;
             }
             h1 {
                 font-size: 0.9rem;
