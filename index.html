@@ -244,73 +244,6 @@
         .controls p {
             margin: 5px 0;
         }
-
-        /* Mobile Touch Controls */
-        .mobile-controls {
-            display: none;
-            margin-top: 20px;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .control-pad {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-            gap: 5px;
-            width: 150px;
-            height: 150px;
-        }
-
-        .control-btn {
-            background: #92400e;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            touch-action: manipulation;
-            user-select: none;
-        }
-
-        .control-btn:hover, .control-btn:active {
-            background: #b45309;
-        }
-
-        .control-btn.up { grid-column: 2; grid-row: 1; }
-        .control-btn.left { grid-column: 1; grid-row: 2; }
-        .control-btn.right { grid-column: 3; grid-row: 2; }
-        .control-btn.down { grid-column: 2; grid-row: 3; }
-
-        /* Show mobile controls on touch devices */
-        @media (hover: none) and (pointer: coarse) {
-            .mobile-controls {
-                display: flex;
-            }
-            .controls {
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Better mobile layout */
-        @media (max-width: 600px) {
-            .game-container {
-                padding: 15px;
-                margin: 10px;
-            }
-            h1 {
-                font-size: 2rem;
-            }
-            .instructions {
-                font-size: 1rem;
-            }
-            .maze-container {
-                transform: scale(0.8);
-                transform-origin: center;
-            }
-        }
     </style>
 </head>
 <body>
@@ -333,17 +266,8 @@
             <button class="reset-button" onclick="resetGame()">Nochmal spielen</button>
         </div>
         
-        <div class="mobile-controls">
-            <div class="control-pad">
-                <button class="control-btn up" onclick="movePlayer('up')">↑</button>
-                <button class="control-btn left" onclick="movePlayer('left')">←</button>
-                <button class="control-btn right" onclick="movePlayer('right')">→</button>
-                <button class="control-btn down" onclick="movePlayer('down')">↓</button>
-            </div>
-        </div>
-
         <div class="controls">
-            <p>🎮 Steuerung: WASD, Pfeiltasten oder Touch-Buttons</p>
+            <p>🎮 Steuerung: WASD oder Pfeiltasten</p>
             <p>🧀 Sammle alle Käsestücke um zu gewinnen!</p>
         </div>
     </div>
@@ -529,58 +453,6 @@
                     break;
             }
         });
-
-        // Touch/Swipe controls for mobile
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchEndX = 0;
-        let touchEndY = 0;
-
-        function handleTouchStart(event) {
-            touchStartX = event.changedTouches[0].screenX;
-            touchStartY = event.changedTouches[0].screenY;
-        }
-
-        function handleTouchEnd(event) {
-            touchEndX = event.changedTouches[0].screenX;
-            touchEndY = event.changedTouches[0].screenY;
-            handleSwipe();
-        }
-
-        function handleSwipe() {
-            const minSwipeDistance = 50;
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = touchEndY - touchStartY;
-
-            if (Math.abs(deltaX) < minSwipeDistance && Math.abs(deltaY) < minSwipeDistance) {
-                return; // Not a swipe
-            }
-
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                // Horizontal swipe
-                if (deltaX > 0) {
-                    movePlayer('right');
-                } else {
-                    movePlayer('left');
-                }
-            } else {
-                // Vertical swipe
-                if (deltaY > 0) {
-                    movePlayer('down');
-                } else {
-                    movePlayer('up');
-                }
-            }
-        }
-
-        // Add touch event listeners
-        document.addEventListener('touchstart', handleTouchStart, false);
-        document.addEventListener('touchend', handleTouchEnd, false);
-
-        // Prevent scrolling on mobile when playing
-        document.addEventListener('touchmove', function(event) {
-            event.preventDefault();
-        }, { passive: false });
 
         // Initialize game when page loads
         window.addEventListener('load', initGame);
