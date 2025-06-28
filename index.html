@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐭 Mäuse-Labyrinth Abenteuer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #fef3c7, #fed7aa);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .game-container {
+            text-align: center;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            padding: 30px;
+            max-width: 600px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #92400e;
+            margin-bottom: 10px;
+            font-family: serif;
+        }
+        
+        .instructions {
+            color: #b45309;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #92400e;
+        }
+        
+        .maze-container {
+            position: relative;
+            border: 4px solid #78716c;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #d6d3d1, #a8a29e);
+            margin: 0 auto 20px;
+            display: inline-block;
+        }
+        
+        .maze-cell {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+        }
+        
+        .wall {
+            background: linear-gradient(135deg, #57534e, #44403c);
+            border: 1px solid #78716c;
+        }
+        
+        .path {
+            background: linear-gradient(135deg, #fef3c7, #fef9e7);
+        }
+        
+        .player {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            left: 2px;
+            top: 2px;
+            transition: all 0.15s ease-out;
+            z-index: 10;
+        }
+        
+        .mouse {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #d1d5db, #9ca3af);
+            border: 2px solid #4b5563;
+            border-radius: 50%;
+            margin: 2px;
+        }
+        
+        .mouse::before,
+        .mouse::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, #d1d5db, #9ca3af);
+            border: 1px solid #4b5563;
+            border-radius: 50%;
+            top: -4px;
+        }
+        
+        .mouse::before { left: -4px; }
+        .mouse::after { right: -4px; }
+        
+        .mouse-eyes {
+            position: absolute;
+            top: 4px;
+        }
+        
+        .mouse-eye {
+            width: 4px;
+            height: 4px;
+            background: black;
+            border-radius: 50%;
+            position: absolute;
+        }
+        
+        .mouse-eye:first-child { left: 4px; }
+        .mouse-eye:last-child { right: 4px; }
+        
+        .mouse-nose {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 2px;
+            background: #f472b6;
+            border-radius: 50%;
+        }
+        
+        .mouse-tail {
+            position: absolute;
+            top: 12px;
+            left: 24px;
+            width: 16px;
+            height: 2px;
+            background: linear-gradient(to right, #9ca3af, #d1d5db);
+            border-radius: 1px;
+            transform: rotate(12deg);
+        }
+        
+        .cheese {
+            position: absolute;
+            width: 20px;
+            height: 16px;
+            background: linear-gradient(135deg, #fde047, #eab308);
+            border: 1px solid #ca8a04;
+            border-radius: 3px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(12deg);
+            z-index: 5;
+        }
+        
+        .cheese::before,
+        .cheese::after {
+            content: '';
+            position: absolute;
+            background: #fef3c7;
+            border-radius: 50%;
+        }
+        
+        .cheese::before {
+            width: 4px;
+            height: 4px;
+            top: 2px;
+            left: 4px;
+        }
+        
+        .cheese::after {
+            width: 2px;
+            height: 2px;
+            top: 6px;
+            right: 2px;
+        }
+        
+        .cheese-sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            top: -4px;
+            right: -4px;
+            opacity: 0.75;
+            animation: sparkle 1s infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.75; }
+            50% { opacity: 0.3; }
+        }
+        
+        .win-message {
+            background: #dcfce7;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .win-message.show {
+            display: block;
+        }
+        
+        .win-message h2 {
+            color: #15803d;
+            margin-bottom: 10px;
+        }
+        
+        .win-message p {
+            color: #166534;
+            margin-bottom: 15px;
+        }
+        
+        .reset-button {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .reset-button:hover {
+            background: #15803d;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            color: #b45309;
+        }
+        
+        .controls p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🐭 Mäuse-Labyrinth Abenteuer</h1>
+        <p class="instructions">Hilf der kleinen Maus, durch das Labyrinth zu navigieren und alle Käsestücke zu sammeln!</p>
+        
+        <div class="score-board">
+            <div>🧀 Käse: <span id="cheese-count">4</span></div>
+            <div>Punkte: <span id="score">0</span></div>
+        </div>
+        
+        <div class="maze-container" id="maze-container">
+            <!-- Maze will be generated here -->
+        </div>
+        
+        <div class="win-message" id="win-message">
+            <h2>🎉 Herzlichen Glückwunsch! 🎉</h2>
+            <p>Du hast alle Käsestücke gesammelt!</p>
+            <button class="reset-button" onclick="resetGame()">Nochmal spielen</button>
+        </div>
+        
+        <div class="controls">
+            <p>🎮 Steuerung: WASD oder Pfeiltasten</p>
+            <p>🧀 Sammle alle Käsestücke um zu gewinnen!</p>
+        </div>
+    </div>
+
+    <script>
+        // Labyrinth Layout: 0 = Wand, 1 = Gang, 2 = Käse
+        const MAZE_LAYOUT = [
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,1,1,1,0,1,1,1,1,1,0,1,1,2,0],
+            [0,1,0,1,0,1,0,0,0,1,0,1,0,1,0],
+            [0,2,0,1,1,1,1,1,0,1,1,1,0,1,0],
+            [0,1,0,0,0,0,0,1,0,0,0,1,0,1,0],
+            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,0,0,1,0,0,0,0,0,1,0,0,0,1,0],
+            [0,2,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,1,0,1,0,0,0,0,0,0,0,1,0,2,0],
+            [0,1,0,1,1,1,1,1,1,1,1,1,0,1,0],
+            [0,1,0,0,0,0,0,1,0,0,0,0,0,1,0],
+            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        ];
+
+        const CELL_SIZE = 32;
+        let playerPos = { x: 1, y: 1 };
+        let maze = JSON.parse(JSON.stringify(MAZE_LAYOUT)); // Deep copy
+        let score = 0;
+        let gameWon = false;
+        let cheeseCount = 0;
+
+        function initGame() {
+            const mazeContainer = document.getElementById('maze-container');
+            mazeContainer.innerHTML = '';
+            
+            // Set maze container size
+            mazeContainer.style.width = (maze[0].length * CELL_SIZE) + 'px';
+            mazeContainer.style.height = (maze.length * CELL_SIZE) + 'px';
+            
+            // Count cheese
+            cheeseCount = maze.flat().filter(cell => cell === 2).length;
+            updateScore();
+            
+            // Create maze cells
+            for (let y = 0; y < maze.length; y++) {
+                for (let x = 0; x < maze[y].length; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'maze-cell';
+                    cell.style.left = (x * CELL_SIZE) + 'px';
+                    cell.style.top = (y * CELL_SIZE) + 'px';
+                    
+                    if (maze[y][x] === 0) {
+                        cell.classList.add('wall');
+                    } else {
+                        cell.classList.add('path');
+                        if (maze[y][x] === 2) {
+                            const cheese = document.createElement('div');
+                            cheese.className = 'cheese';
+                            cheese.innerHTML = '<div class="cheese-sparkle"></div>';
+                            cell.appendChild(cheese);
+                        }
+                    }
+                    
+                    mazeContainer.appendChild(cell);
+                }
+            }
+            
+            // Create player
+            const player = document.createElement('div');
+            player.id = 'player';
+            player.className = 'player';
+            player.innerHTML = `
+                <div class="mouse">
+                    <div class="mouse-eyes">
+                        <div class="mouse-eye"></div>
+                        <div class="mouse-eye"></div>
+                    </div>
+                    <div class="mouse-nose"></div>
+                    <div class="mouse-tail"></div>
+                </div>
+            `;
+            mazeContainer.appendChild(player);
+            
+            updatePlayerPosition();
+        }
+
+        function updatePlayerPosition() {
+            const player = document.getElementById('player');
+            player.style.left = (playerPos.x * CELL_SIZE) + 'px';
+            player.style.top = (playerPos.y * CELL_SIZE) + 'px';
+        }
+
+        function updateScore() {
+            document.getElementById('cheese-count').textContent = cheeseCount;
+            document.getElementById('score').textContent = score;
+        }
+
+        function movePlayer(direction) {
+            if (gameWon) return;
+
+            let newX = playerPos.x;
+            let newY = playerPos.y;
+
+            switch (direction) {
+                case 'up':
+                    newY = Math.max(0, playerPos.y - 1);
+                    break;
+                case 'down':
+                    newY = Math.min(maze.length - 1, playerPos.y + 1);
+                    break;
+                case 'left':
+                    newX = Math.max(0, playerPos.x - 1);
+                    break;
+                case 'right':
+                    newX = Math.min(maze[0].length - 1, playerPos.x + 1);
+                    break;
+            }
+
+            // Kollisionserkennung mit Wänden
+            if (maze[newY][newX] === 0) {
+                return; // Keine Bewegung bei Kollision
+            }
+
+            // Käse sammeln
+            if (maze[newY][newX] === 2) {
+                maze[newY][newX] = 1; // Käse entfernen
+                score += 100;
+                cheeseCount--;
+                updateScore();
+                
+                // Remove cheese from display
+                const cells = document.querySelectorAll('.maze-cell');
+                const cellIndex = newY * maze[0].length + newX;
+                const cheese = cells[cellIndex].querySelector('.cheese');
+                if (cheese) {
+                    cheese.remove();
+                }
+            }
+
+            playerPos = { x: newX, y: newY };
+            updatePlayerPosition();
+
+            // Gewinn-Überprüfung
+            if (cheeseCount === 0 && score > 0) {
+                gameWon = true;
+                document.getElementById('win-message').classList.add('show');
+            }
+        }
+
+        function resetGame() {
+            playerPos = { x: 1, y: 1 };
+            maze = JSON.parse(JSON.stringify(MAZE_LAYOUT));
+            score = 0;
+            gameWon = false;
+            document.getElementById('win-message').classList.remove('show');
+            initGame();
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    event.preventDefault();
+                    movePlayer('up');
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    event.preventDefault();
+                    movePlayer('down');
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    event.preventDefault();
+                    movePlayer('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    event.preventDefault();
+                    movePlayer('right');
+                    break;
+            }
+        });
+
+        // Initialize game when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html> 
