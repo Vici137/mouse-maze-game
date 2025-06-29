@@ -3,352 +3,612 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐭 Maus Labyrinth Spiel 🧀</title>
+    <title>Maus Labyrinth Spiel - Mit Katze!</title>
     <style>
-        body {
+        * {
             margin: 0;
-            padding: 10px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: #333;
+            overflow: hidden;
+            touch-action: manipulation;
         }
+        
         .game-container {
             background: white;
-            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             text-align: center;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
         }
-        .game-title {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .maze {
-            display: inline-block;
-            border: 3px solid #333;
-            background: #f0f0f0;
-        }
-        .maze-row {
+        
+        .game-header {
             display: flex;
-            height: 30px;
-        }
-        .maze-cell {
-            width: 30px;
-            height: 30px;
-            position: relative;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .wall { background: #333; }
-        .path { background: #fff; }
-        .player, .cat, .cheese {
-            font-size: 20px;
-            position: absolute;
-        }
+        
         .score {
             font-size: 18px;
-            margin: 15px 0;
-            color: #666;
+            font-weight: bold;
+            color: #8B4513;
         }
+        
+        .maze-container {
+            position: relative;
+            background: linear-gradient(45deg, #D2B48C, #DEB887);
+            border-radius: 10px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            border: 4px solid #8B4513;
+            margin: 0 auto;
+            transform-origin: center;
+        }
+        
+        .maze-cell {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+        }
+        
+        .wall {
+            background: linear-gradient(45deg, #696969, #556B2F);
+            border: 1px solid #2F4F4F;
+        }
+        
+        .path {
+            background: linear-gradient(45deg, #FFF8DC, #F5F5DC);
+        }
+        
+        .player {
+            position: absolute;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+        
+        .cat {
+            position: absolute;
+            z-index: 20;
+            transition: all 0.2s ease;
+        }
+        
+        .cheese {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 6px;
+            top: 6px;
+            background: #FFD700;
+            border-radius: 50% 50% 50% 10%;
+            transform: rotate(-45deg);
+            z-index: 5;
+        }
+        
+        .cheese::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #FFA500;
+            border-radius: 50%;
+            left: 3px;
+            top: 3px;
+        }
+        
+        .game-over, .game-won {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid;
+            margin-top: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .game-won {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .game-over {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .game-won h2 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .game-over h2 {
+            color: #721c24;
+            margin-bottom: 10px;
+        }
+        
+        .game-won p {
+            color: #155724;
+            margin-bottom: 20px;
+        }
+        
+        .game-over p {
+            color: #721c24;
+            margin-bottom: 20px;
+        }
+        
+        .reset-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            touch-action: manipulation;
+        }
+        
+        .reset-btn:hover {
+            background: #0056b3;
+        }
+        
+        .reset-btn.danger {
+            background: #dc3545;
+        }
+        
+        .reset-btn.danger:hover {
+            background: #c82333;
+        }
+        
+        .reset-btn.success {
+            background: #28a745;
+        }
+        
+        .reset-btn.success:hover {
+            background: #1e7e34;
+        }
+        
         .controls {
             margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 8px;
+            justify-content: center;
         }
+        
         .control-btn {
-            background: #4CAF50;
+            width: 60px;
+            height: 60px;
+            background: #007bff;
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 15px;
-            font-size: 18px;
+            font-size: 24px;
+            font-weight: bold;
             cursor: pointer;
-            margin: 5px;
+            transition: background 0.2s;
+            touch-action: manipulation;
+            user-select: none;
         }
+        
         .control-btn:active {
-            background: #45a049;
+            background: #0056b3;
+            transform: scale(0.95);
         }
-        .instructions {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #666;
-        }
-        .game-over, .game-won {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 1000;
-        }
-        .reset-btn {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-        }
+        
+        /* Mobile responsiveness */
         @media (max-width: 600px) {
-            .game-container {
-                transform: scale(0.7);
-                transform-origin: center;
+            .maze-container {
+                transform: scale(0.28);
+                margin: -115px auto -63px;
+                max-width: 55vw;
             }
-            .instructions { display: none; }
+            
+            .game-container {
+                padding: 10px;
+                max-width: 95vw;
+            }
+            
+            .game-header {
+                font-size: 14px;
+            }
+            
+            .controls {
+                grid-template-columns: repeat(3, 50px);
+                gap: 6px;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .maze-container {
+                transform: scale(0.22);
+                margin: -125px auto -75px;
+                max-width: 50vw;
+            }
+        }
+        
+        @media (max-width: 390px) and (max-height: 850px) {
+            /* iPhone 12 Pro specific */
+            .maze-container {
+                transform: scale(0.11);
+                margin: -145px auto -95px;
+                max-width: 45vw;
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .maze-container {
+                transform: scale(0.09);
+                margin: -155px auto -105px;
+                max-width: 40vw;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .maze-container {
+                transform: scale(0.08);
+                margin: -160px auto -110px;
+                max-width: 35vw;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="game-title">🐭 Maus Labyrinth Abenteuer 🧀</div>
-        <div class="score">Punkte: <span id="score">0</span> | Käse: <span id="cheeseCount">4</span></div>
-        <div class="maze" id="maze"></div>
-        <div class="controls">
-            <div>
-                <button class="control-btn" onclick="movePlayer(0,-1)">↑</button>
-            </div>
-            <div>
-                <button class="control-btn" onclick="movePlayer(-1,0)">←</button>
-                <button class="control-btn" onclick="movePlayer(1,0)">→</button>
-            </div>
-            <div>
-                <button class="control-btn" onclick="movePlayer(0,1)">↓</button>
-            </div>
-            <div class="instructions">
-                Verwende die Pfeiltasten oder WASD zum Bewegen.<br>
-                Sammle alle Käsestücke und vermeide die Katze! 🐱
-            </div>
+    <div class="game-container" id="gameContainer">
+        <div class="game-header">
+            <div class="score">🧀 Käse: <span id="cheeseCount">4</span></div>
+            <div class="score">Punkte: <span id="score">0</span></div>
         </div>
-        <div class="game-over" id="gameOver" style="display: none;">
-            <h2>🐱 Die Katze hat dich erwischt!</h2>
-            <p>Versuche es nochmal!</p>
-            <button class="reset-btn" onclick="resetGame()">Nochmal spielen</button>
+        
+        <div class="maze-container" id="mazeContainer">
+            <!-- Maze will be generated here -->
         </div>
-        <div class="game-won" id="gameWon" style="display: none;">
-            <h2>🎉 Gewonnen!</h2>
-            <p>Du hast alle Käsestücke gesammelt!</p>
-            <p>Endpunktzahl: <span id="finalScore"></span></p>
-            <button class="reset-btn" onclick="resetGame()">Nochmal spielen</button>
+        
+        <div class="controls" id="controls">
+            <div></div>
+            <button class="control-btn" onclick="movePlayer('up')">↑</button>
+            <div></div>
+            <button class="control-btn" onclick="movePlayer('left')">←</button>
+            <div></div>
+            <button class="control-btn" onclick="movePlayer('right')">→</button>
+            <div></div>
+            <button class="control-btn" onclick="movePlayer('down')">↓</button>
+            <div></div>
         </div>
+        
+        <div id="gameEndScreen"></div>
     </div>
 
     <script>
-        let gameState = {
-            player: { x: 1, y: 1 },
-            cat: { x: 13, y: 11 },
-            cheese: [
-                { x: 3, y: 2 },
-                { x: 11, y: 5 },
-                { x: 7, y: 9 },
-                { x: 13, y: 2 }
-            ],
-            score: 0,
-            gameRunning: true
-        };
-
-        const maze = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-            [1,0,1,0,1,0,1,1,1,1,1,1,1,0,1],
-            [1,0,1,0,0,0,0,0,0,0,0,0,1,0,1],
-            [1,0,1,1,1,1,1,0,1,1,1,0,1,0,1],
-            [1,0,0,0,0,0,0,0,1,0,0,0,1,0,1],
-            [1,1,1,0,1,1,1,0,1,0,1,1,1,0,1],
-            [1,0,0,0,0,0,1,0,0,0,1,0,0,0,1],
-            [1,0,1,1,1,0,1,1,1,0,1,0,1,1,1],
-            [1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
-            [1,1,1,0,1,1,1,0,1,1,1,1,1,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        // Labyrinth Layout: 0 = Wand, 1 = Gang, 2 = Käse
+        const MAZE_LAYOUT = [
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,1,1,1,0,1,1,1,1,1,0,1,1,2,0],
+            [0,1,0,1,0,1,0,0,0,1,0,1,0,1,0],
+            [0,2,0,1,1,1,1,1,0,1,1,1,0,1,0],
+            [0,1,0,0,0,0,0,1,0,0,0,1,0,1,0],
+            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,0,0,1,0,0,0,0,0,1,0,0,0,1,0],
+            [0,2,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,1,0,1,0,0,0,0,0,0,0,1,0,2,0],
+            [0,1,0,1,1,1,1,1,1,1,1,1,0,1,0],
+            [0,1,0,0,0,0,0,1,0,0,0,0,0,1,0],
+            [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         ];
 
+        const CELL_SIZE = 32;
+        
+        let gameState = {
+            playerPos: { x: 1, y: 1 },
+            catPos: { x: 13, y: 11 },
+            maze: JSON.parse(JSON.stringify(MAZE_LAYOUT)),
+            score: 0,
+            gameWon: false,
+            gameOver: false,
+            cheeseCount: 0,
+            catTimer: null
+        };
+
         function initGame() {
-            const mazeElement = document.getElementById("maze");
-            mazeElement.innerHTML = "";
+            gameState = {
+                playerPos: { x: 1, y: 1 },
+                catPos: { x: 13, y: 11 },
+                maze: JSON.parse(JSON.stringify(MAZE_LAYOUT)),
+                score: 0,
+                gameWon: false,
+                gameOver: false,
+                cheeseCount: MAZE_LAYOUT.flat().filter(cell => cell === 2).length,
+                catTimer: null
+            };
             
-            for (let y = 0; y < maze.length; y++) {
-                const row = document.createElement("div");
-                row.className = "maze-row";
-                
-                for (let x = 0; x < maze[y].length; x++) {
-                    const cell = document.createElement("div");
-                    cell.className = `maze-cell ${maze[y][x] === 1 ? "wall" : "path"}`;
-                    cell.id = `cell-${x}-${y}`;
-                    row.appendChild(cell);
-                }
-                
-                mazeElement.appendChild(row);
-            }
-            
-            updateDisplay();
+            renderMaze();
+            updateUI();
+            startCatAI();
         }
 
-        function updateDisplay() {
-            document.querySelectorAll(".player, .cheese, .cat").forEach(el => el.remove());
-            
-            const playerCell = document.getElementById(`cell-${gameState.player.x}-${gameState.player.y}`);
-            if (playerCell) {
-                const playerSpan = document.createElement("span");
-                playerSpan.className = "player";
-                playerSpan.textContent = "🐭";
-                playerCell.appendChild(playerSpan);
-            }
-            
-            const catCell = document.getElementById(`cell-${gameState.cat.x}-${gameState.cat.y}`);
-            if (catCell) {
-                const catSpan = document.createElement("span");
-                catSpan.className = "cat";
-                catSpan.textContent = "🐱";
-                catCell.appendChild(catSpan);
-            }
-            
-            gameState.cheese.forEach(cheese => {
-                const cheeseCell = document.getElementById(`cell-${cheese.x}-${cheese.y}`);
-                if (cheeseCell) {
-                    const cheeseSpan = document.createElement("span");
-                    cheeseSpan.className = "cheese";
-                    cheeseSpan.textContent = "🧀";
-                    cheeseCell.appendChild(cheeseSpan);
-                }
-            });
-            
-            document.getElementById("score").textContent = gameState.score;
-            document.getElementById("cheeseCount").textContent = gameState.cheese.length;
-        }
+        function renderMaze() {
+            const container = document.getElementById('mazeContainer');
+            container.innerHTML = '';
+            container.style.width = MAZE_LAYOUT[0].length * CELL_SIZE + 'px';
+            container.style.height = MAZE_LAYOUT.length * CELL_SIZE + 'px';
 
-        function isValidMove(x, y) {
-            return x >= 0 && x < maze[0].length && 
-                   y >= 0 && y < maze.length && 
-                   maze[y][x] === 0;
-        }
-
-        function movePlayer(dx, dy) {
-            if (!gameState.gameRunning) return;
-            
-            const newX = gameState.player.x + dx;
-            const newY = gameState.player.y + dy;
-            
-            if (isValidMove(newX, newY)) {
-                gameState.player.x = newX;
-                gameState.player.y = newY;
-                
-                const cheeseIndex = gameState.cheese.findIndex(
-                    cheese => cheese.x === newX && cheese.y === newY
-                );
-                
-                if (cheeseIndex !== -1) {
-                    gameState.cheese.splice(cheeseIndex, 1);
-                    gameState.score += 100;
+            // Render maze cells
+            for (let y = 0; y < MAZE_LAYOUT.length; y++) {
+                for (let x = 0; x < MAZE_LAYOUT[0].length; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = `maze-cell ${MAZE_LAYOUT[y][x] === 0 ? 'wall' : 'path'}`;
+                    cell.style.left = x * CELL_SIZE + 'px';
+                    cell.style.top = y * CELL_SIZE + 'px';
                     
-                    if (gameState.cheese.length === 0) {
-                        gameState.gameRunning = false;
-                        document.getElementById("finalScore").textContent = gameState.score;
-                        document.getElementById("gameWon").style.display = "block";
-                        return;
+                    if (gameState.maze[y][x] === 2) {
+                        const cheese = document.createElement('div');
+                        cheese.className = 'cheese';
+                        cell.appendChild(cheese);
                     }
+                    
+                    container.appendChild(cell);
                 }
-                
-                if (gameState.player.x === gameState.cat.x && gameState.player.y === gameState.cat.y) {
-                    gameState.gameRunning = false;
-                    document.getElementById("gameOver").style.display = "block";
-                    return;
-                }
-                
-                updateDisplay();
             }
+
+            // Render player
+            const player = document.createElement('div');
+            player.id = 'player';
+            player.className = 'player';
+            player.innerHTML = createPlayerHTML();
+            player.style.left = gameState.playerPos.x * CELL_SIZE + 'px';
+            player.style.top = gameState.playerPos.y * CELL_SIZE + 'px';
+            player.style.width = CELL_SIZE + 'px';
+            player.style.height = CELL_SIZE + 'px';
+            container.appendChild(player);
+
+            // Render cat
+            const cat = document.createElement('div');
+            cat.id = 'cat';
+            cat.className = 'cat';
+            cat.innerHTML = createCatHTML();
+            cat.style.left = gameState.catPos.x * CELL_SIZE + 'px';
+            cat.style.top = gameState.catPos.y * CELL_SIZE + 'px';
+            cat.style.width = CELL_SIZE + 'px';
+            cat.style.height = CELL_SIZE + 'px';
+            container.appendChild(cat);
+        }
+
+        function createPlayerHTML() {
+            return '<div style="position: relative; width: 100%; height: 100%;"><div style="position: absolute; width: 4px; height: 12px; background: #FFB6C1; border-radius: 2px; left: 2px; top: 16px; transform: rotate(45deg);"></div><div style="position: absolute; width: 18px; height: 16px; background: #FFB6C1; border-radius: 50%; border: 2px solid #FF69B4; left: 8px; top: 10px;"></div><div style="position: absolute; width: 14px; height: 12px; background: #FFB6C1; border-radius: 50%; border: 2px solid #FF69B4; left: 10px; top: 6px;"><div style="position: absolute; width: 6px; height: 6px; background: #FF69B4; border-radius: 50%; left: 1px; top: -2px;"></div><div style="position: absolute; width: 6px; height: 6px; background: #FF69B4; border-radius: 50%; right: 1px; top: -2px;"></div><div style="position: absolute; width: 2px; height: 2px; background: black; border-radius: 50%; left: 3px; top: 3px;"></div><div style="position: absolute; width: 2px; height: 2px; background: black; border-radius: 50%; right: 3px; top: 3px;"></div><div style="position: absolute; width: 2px; height: 2px; background: #FF1493; border-radius: 50%; left: 6px; top: 5px;"></div></div></div>';
+        }
+
+        function createCatHTML() {
+            return '<div style="position: relative; width: 100%; height: 100%;"><div style="position: absolute; width: 6px; height: 16px; background: #FF4500; border-radius: 3px; left: 2px; top: 8px; transform: rotate(-20deg);"></div><div style="position: absolute; width: 20px; height: 18px; background: #FF6347; border-radius: 50%; border: 2px solid #FF4500; left: 6px; top: 8px;"></div><div style="position: relative; position: absolute; width: 16px; height: 14px; background: #FF7F50; border-radius: 50%; border: 2px solid #FF4500; left: 8px; top: 4px;"><div style="position: absolute; width: 4px; height: 6px; background: #FF4500; border-radius: 50%; left: 2px; top: -2px;"></div><div style="position: absolute; width: 4px; height: 6px; background: #FF4500; border-radius: 50%; right: 2px; top: -2px;"></div><div style="position: absolute; width: 3px; height: 3px; background: #FF0000; border-radius: 50%; left: 3px; top: 4px;"></div><div style="position: absolute; width: 3px; height: 3px; background: #FF0000; border-radius: 50%; right: 3px; top: 4px;"></div><div style="position: absolute; width: 2px; height: 2px; background: #FFB6C1; border-radius: 50%; left: 7px; top: 6px;"></div><div style="position: absolute; width: 8px; height: 1px; background: black; left: -2px; top: 7px;"></div><div style="position: absolute; width: 8px; height: 1px; background: black; right: -2px; top: 7px;"></div></div><div style="position: absolute; width: 4px; height: 4px; background: #FF4500; border-radius: 50%; left: 8px; bottom: 2px;"></div><div style="position: absolute; width: 4px; height: 4px; background: #FF4500; border-radius: 50%; right: 8px; bottom: 2px;"></div></div>';
+        }
+
+        function movePlayer(direction) {
+            if (gameState.gameWon || gameState.gameOver) return;
+
+            let newX = gameState.playerPos.x;
+            let newY = gameState.playerPos.y;
+
+            switch (direction) {
+                case 'up':
+                    newY = Math.max(0, gameState.playerPos.y - 1);
+                    break;
+                case 'down':
+                    newY = Math.min(MAZE_LAYOUT.length - 1, gameState.playerPos.y + 1);
+                    break;
+                case 'left':
+                    newX = Math.max(0, gameState.playerPos.x - 1);
+                    break;
+                case 'right':
+                    newX = Math.min(MAZE_LAYOUT[0].length - 1, gameState.playerPos.x + 1);
+                    break;
+            }
+
+            // Kollisionserkennung mit Wänden
+            if (gameState.maze[newY][newX] === 0) {
+                return; // Keine Bewegung bei Kollision
+            }
+
+            // Käse sammeln
+            if (gameState.maze[newY][newX] === 2) {
+                gameState.maze[newY][newX] = 1; // Käse entfernen
+                gameState.score += 100;
+                gameState.cheeseCount--;
+            }
+
+            gameState.playerPos = { x: newX, y: newY };
+            updatePlayerPosition();
+            updateUI();
+            checkWinCondition();
+            checkCatCollision();
+        }
+
+        function startCatAI() {
+            if (gameState.catTimer) {
+                clearInterval(gameState.catTimer);
+            }
+            
+            gameState.catTimer = setInterval(() => {
+                if (gameState.gameWon || gameState.gameOver) return;
+                
+                moveCat();
+            }, 800);
         }
 
         function moveCat() {
-            if (!gameState.gameRunning) return;
-            
-            const dx = gameState.player.x - gameState.cat.x;
-            const dy = gameState.player.y - gameState.cat.y;
-            
-            let moveX = 0, moveY = 0;
-            
-            if (Math.abs(dx) > Math.abs(dy)) {
-                moveX = dx > 0 ? 1 : -1;
-            } else {
-                moveY = dy > 0 ? 1 : -1;
+            const possibleMoves = [
+                { x: gameState.catPos.x, y: gameState.catPos.y - 1 },
+                { x: gameState.catPos.x, y: gameState.catPos.y + 1 },
+                { x: gameState.catPos.x - 1, y: gameState.catPos.y },
+                { x: gameState.catPos.x + 1, y: gameState.catPos.y }
+            ].filter(move => 
+                move.x >= 0 && move.x < MAZE_LAYOUT[0].length &&
+                move.y >= 0 && move.y < MAZE_LAYOUT.length &&
+                gameState.maze[move.y][move.x] !== 0
+            );
+
+            if (possibleMoves.length === 0) return;
+
+            // Finde den Zug, der die Katze näher zur Maus bringt
+            const bestMove = possibleMoves.reduce((best, move) => {
+                const distToPlayer = Math.abs(move.x - gameState.playerPos.x) + Math.abs(move.y - gameState.playerPos.y);
+                const bestDistToPlayer = Math.abs(best.x - gameState.playerPos.x) + Math.abs(best.y - gameState.playerPos.y);
+                return distToPlayer < bestDistToPlayer ? move : best;
+            });
+
+            gameState.catPos = bestMove;
+            updateCatPosition();
+            checkCatCollision();
+        }
+
+        function updatePlayerPosition() {
+            const player = document.getElementById('player');
+            if (player) {
+                player.style.left = gameState.playerPos.x * CELL_SIZE + 'px';
+                player.style.top = gameState.playerPos.y * CELL_SIZE + 'px';
             }
-            
-            let newX = gameState.cat.x + moveX;
-            let newY = gameState.cat.y + moveY;
-            
-            if (isValidMove(newX, newY)) {
-                gameState.cat.x = newX;
-                gameState.cat.y = newY;
+        }
+
+        function updateCatPosition() {
+            const cat = document.getElementById('cat');
+            if (cat) {
+                cat.style.left = gameState.catPos.x * CELL_SIZE + 'px';
+                cat.style.top = gameState.catPos.y * CELL_SIZE + 'px';
             }
-            
-            if (gameState.player.x === gameState.cat.x && gameState.player.y === gameState.cat.y) {
-                gameState.gameRunning = false;
-                document.getElementById("gameOver").style.display = "block";
-                return;
+        }
+
+        function checkCatCollision() {
+            if (gameState.playerPos.x === gameState.catPos.x && gameState.playerPos.y === gameState.catPos.y) {
+                gameState.gameOver = true;
+                clearInterval(gameState.catTimer);
+                showGameOver();
             }
+        }
+
+        function checkWinCondition() {
+            if (gameState.cheeseCount === 0 && gameState.score > 0) {
+                gameState.gameWon = true;
+                clearInterval(gameState.catTimer);
+                showGameWon();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('cheeseCount').textContent = gameState.cheeseCount;
+            document.getElementById('score').textContent = gameState.score;
             
-            updateDisplay();
+            // Update cheese visibility
+            renderMaze();
+        }
+
+        function showGameWon() {
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('gameEndScreen').innerHTML = '<div class="game-won"><h2>🎉 Herzlichen Glückwunsch! 🎉</h2><p>Du hast alle Käsestücke gesammelt und die Katze überlistet!</p><button class="reset-btn success" onclick="resetGame()">Nochmal spielen</button></div>';
+        }
+
+        function showGameOver() {
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('gameEndScreen').innerHTML = '<div class="game-over"><h2>😿 Erwischt! 😿</h2><p>Die Katze hat dich gefangen! Versuche es nochmal.</p><button class="reset-btn danger" onclick="resetGame()">Nochmal versuchen</button></div>';
         }
 
         function resetGame() {
-            gameState = {
-                player: { x: 1, y: 1 },
-                cat: { x: 13, y: 11 },
-                cheese: [
-                    { x: 3, y: 2 },
-                    { x: 11, y: 5 },
-                    { x: 7, y: 9 },
-                    { x: 13, y: 2 }
-                ],
-                score: 0,
-                gameRunning: true
-            };
-            
-            document.getElementById("gameOver").style.display = "none";
-            document.getElementById("gameWon").style.display = "none";
-            updateDisplay();
+            document.getElementById('controls').style.display = 'grid';
+            document.getElementById('gameEndScreen').innerHTML = '';
+            initGame();
         }
 
-        document.addEventListener("keydown", (e) => {
-            switch(e.key) {
-                case "ArrowUp":
-                case "w":
-                case "W":
-                    e.preventDefault();
-                    movePlayer(0, -1);
+        // Keyboard controls
+        document.addEventListener('keydown', (event) => {
+            const key = event.key.toLowerCase();
+            
+            switch (key) {
+                case 'arrowup':
+                case 'w':
+                    event.preventDefault();
+                    movePlayer('up');
                     break;
-                case "ArrowDown":
-                case "s":
-                case "S":
-                    e.preventDefault();
-                    movePlayer(0, 1);
+                case 'arrowdown':
+                case 's':
+                    event.preventDefault();
+                    movePlayer('down');
                     break;
-                case "ArrowLeft":
-                case "a":
-                case "A":
-                    e.preventDefault();
-                    movePlayer(-1, 0);
+                case 'arrowleft':
+                case 'a':
+                    event.preventDefault();
+                    movePlayer('left');
                     break;
-                case "ArrowRight":
-                case "d":
-                case "D":
-                    e.preventDefault();
-                    movePlayer(1, 0);
+                case 'arrowright':
+                case 'd':
+                    event.preventDefault();
+                    movePlayer('right');
                     break;
             }
         });
 
+        // Touch swipe controls
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.getElementById('mazeContainer').addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            e.preventDefault();
+        }, { passive: false });
+        
+        document.getElementById('mazeContainer').addEventListener('touchend', (e) => {
+            if (!touchStartX || !touchStartY) return;
+            
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
+            
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > 25) {
+                    if (diffX > 0) {
+                        movePlayer('left');
+                    } else {
+                        movePlayer('right');
+                    }
+                }
+            } else {
+                if (Math.abs(diffY) > 25) {
+                    if (diffY > 0) {
+                        movePlayer('up');
+                    } else {
+                        movePlayer('down');
+                    }
+                }
+            }
+            
+            touchStartX = 0;
+            touchStartY = 0;
+            e.preventDefault();
+        }, { passive: false });
+
+        // Initialize game on load
         initGame();
-        setInterval(moveCat, 800);
     </script>
 </body>
 </html>
